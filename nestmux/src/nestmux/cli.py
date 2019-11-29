@@ -14,32 +14,20 @@ also be used as template for Python modules.
 
 Note: This skeleton file can be safely removed if not needed!
 """
-
+import os
 import argparse
 import sys
 import logging
+import pathlib
+import yaml
+from string import Template
+from pathlib import Path, PurePath
 
 from nestmux import __version__
 
 __author__ = "Oivvio Polite"
 __copyright__ = "Oivvio Polite"
 __license__ = "mit"
-
-
-def fib(n):
-    """Fibonacci example function
-
-    Args:
-      n (int): integer
-
-    Returns:
-      int: n-th Fibonacci number
-    """
-    assert n > 0
-    a, b = 1, 1
-    for i in range(n - 1):
-        a, b = b, a + b
-    return a
 
 
 def parse_args(args):
@@ -90,6 +78,50 @@ def parse_args(args):
 #     )
 
 
+def get_config():
+    # Get the configpath
+    configpath = PurePath(Path.home(), ".nestmux", "config.yml")
+    if not Path(configpath).exists():
+        print(f"Please create a config file in {configpath}")
+        exit()
+
+    with open(configpath) as configfile:
+        config = yaml.load(configfile)
+
+    return config
+
+
+def write_bashscript(config):
+    print(config)
+    parentfolder = Path(__file__).parent
+
+    templatefn = Path(parentfolder, "templates", "bashtemplate.sh")
+    template = Template(open(templatefn).read())
+    context = {"configpath": config["configpath"]}
+    output = template.substitute(context)
+
+    path = Path(config["path"], "nestmux")
+
+    path.open("w").write(output)
+    path.chmod(0o755)
+
+
+def write_configfiles(config):
+    for level in range(1, config["levels"] + 1):
+        write_configfile(config, level)
+
+
+def write_configfile(config, level):
+    # Read the standard
+    template = Template(("unbind C-b\n" "set -g prefix C-$escape_key\n"))
+    index = level - 1
+    context = {"escape_key": config["escape_keys"][index]}
+    output = template.substitute(context)
+
+    path = Path(config["configpath"], f"nestmuxconfig_level{level}")
+    path.open("w").write(output)
+
+
 def main(args):
     """Main entry point allowing external calls
 
@@ -100,8 +132,11 @@ def main(args):
     # setup_logging(args.loglevel)
     # _logger.debug("Starting crazy calculations...")
     # print("The {}-th Fibonacci number is {}".format(args.n, fib(args.n)))
-    print("hello")
+
     # _logger.info("Script ends here")
+    config = get_config()
+    write_bashscript(config)
+    # write_configfiles(config)
 
 
 def run():
