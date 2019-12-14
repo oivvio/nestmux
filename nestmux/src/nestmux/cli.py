@@ -136,7 +136,7 @@ def main(args):
     # _logger.info("Script ends here")
     config = get_config()
     write_bashscript(config)
-    # write_configfiles(config)
+    write_configfiles(config)
 
 
 def run():
