@@ -41,41 +41,9 @@ def parse_args(args):
     """
     parser = argparse.ArgumentParser(description="Generate scripts to run nested tmux")
 
-    # parser.add_argument(
-    #     "--version", action="version", version="nestmux {ver}".format(ver=__version__)
-    # )
-
-    # parser.add_argument(
-    #     "-v",
-    #     "--verbose",
-    #     dest="loglevel",
-    #     help="set loglevel to INFO",
-    #     action="store_const",
-    #     const=logging.INFO,
-    # )
-
-    # parser.add_argument(
-    #     "-vv",
-    #     "--very-verbose",
-    #     dest="loglevel",
-    #     help="set loglevel to DEBUG",
-    #     action="store_const",
-    #     const=logging.DEBUG,
-    # )
-
     return parser.parse_args(args)
 
 
-# def setup_logging(loglevel):
-#     """Setup basic logging
-
-#     Args:
-#       loglevel (int): minimum loglevel for emitting messages
-#     """
-#     logformat = "[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
-#     logging.basicConfig(
-#         level=loglevel, stream=sys.stdout, format=logformat, datefmt="%Y-%m-%d %H:%M:%S"
-#     )
 
 
 def get_config():
@@ -112,6 +80,10 @@ def write_configfiles(config):
 
 
 def write_configfile(config, level):
+    # Read the base config
+    base_config = open(config["base_tmux_config"]).read()
+    
+    
     # Read the standard
     template = Template(("unbind C-b\n" "set -g prefix C-$escape_key\n"))
     index = level - 1
@@ -119,7 +91,10 @@ def write_configfile(config, level):
     output = template.substitute(context)
 
     path = Path(config["configpath"], f"nestmuxconfig_level{level}")
-    path.open("w").write(output)
+    with(path.open("w")) as fh:
+        fh.write(base_config)
+        fh.write("\n")
+        fh.write(output)
 
 
 def main(args):
