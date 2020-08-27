@@ -49,12 +49,13 @@ def parse_args(args):
 def get_config():
     # Get the configpath
     configpath = PurePath(Path.home(), ".nestmux", "config.yml")
+
     if not Path(configpath).exists():
         print(f"Please create a config file in {configpath}")
         exit()
 
     with open(configpath) as configfile:
-        config = yaml.load(configfile)
+        config = yaml.load(configfile, Loader=yaml.FullLoader)
 
     return config
 
@@ -81,8 +82,12 @@ def write_configfiles(config):
 
 def write_configfile(config, level):
     # Read the base config
-    base_config = open(config["base_tmux_config"]).read()
-    
+    try:
+        base_config = open(config["base_tmux_config"]).read()
+
+    except KeyError as e:
+        print("No base_tmux_config in your config.yml")
+        base_config = None
     
     # Read the standard
     template = Template(("unbind C-b\n" "set -g prefix C-$escape_key\n"))
@@ -92,8 +97,9 @@ def write_configfile(config, level):
 
     path = Path(config["configpath"], f"nestmuxconfig_level{level}")
     with(path.open("w")) as fh:
-        fh.write(base_config)
-        fh.write("\n")
+        if base_config:
+            fh.write(base_config)
+            fh.write("\n")
         fh.write(output)
 
 
