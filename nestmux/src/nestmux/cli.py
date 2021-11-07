@@ -44,17 +44,15 @@ def parse_args(args):
     return parser.parse_args(args)
 
 
-
-
 def get_config():
-    # Get the configpath
-    configpath = PurePath(Path.home(), ".nestmux", "config.yml")
+    # Get the configfilename
+    configfn = PurePath(Path.home(), ".nestmux", "config.yml")
 
-    if not Path(configpath).exists():
-        print(f"Please create a config file in {configpath}")
+    if not Path(configfn).exists():
+        print(f"Please create a config file in {configfn}")
         exit()
 
-    with open(configpath) as configfile:
+    with open(configfn) as configfile:
         config = yaml.load(configfile, Loader=yaml.FullLoader)
 
     return config
@@ -66,7 +64,7 @@ def write_bashscript(config):
 
     templatefn = Path(parentfolder, "templates", "bashtemplate.sh")
     template = Template(open(templatefn).read())
-    context = {"configpath": config["configpath"]}
+    context = {"configpath": os.path.expanduser(config["configpath"])}
     output = template.substitute(context)
 
     path = Path(config["path"], "nestmux")
@@ -82,21 +80,40 @@ def write_configfiles(config):
 
 def write_configfile(config, level):
     # Read the base config
-    try:
-        base_config = open(config["base_tmux_config"]).read()
+    # try:
+    #     base_config = open(config["base_tmux_config"]).read()
+    # except KeyError as e:
+    #     print("No base_tmux_config in your config.yml")
+    #     base_config = None
 
-    except KeyError as e:
-        print("No base_tmux_config in your config.yml")
-        base_config = None
-    
+    base_config = ""
+    if not ("skip_system_config" in config and config["skip_system_config"] == True):
+        try:
+            global_tmux_config = open("/etc/tmux.conf").read()
+            base_config += global_tmux_config
+            base_config += "\n"
+
+        except BaseException as e:
+            pass
+
+    if not ("skip_user_config" in config and config["skip_user_config"] == True):
+        try:
+            user_tmux_config = open(os.path.expanduser("~/.tmux.conf")).read()
+            base_config += user_tmux_config
+            base_config += "\n"
+
+        except BaseException as e:
+            pass
+
     # Read the standard
     template = Template(("unbind C-b\n" "set -g prefix C-$escape_key\n"))
     index = level - 1
     context = {"escape_key": config["escape_keys"][index]}
     output = template.substitute(context)
 
-    path = Path(config["configpath"], f"nestmuxconfig_level{level}")
-    with(path.open("w")) as fh:
+    path = Path(os.path.expanduser(config["configpath"]), f"nestmuxconfig_level{level}")
+
+    with (path.open("w")) as fh:
         if base_config:
             fh.write(base_config)
             fh.write("\n")
