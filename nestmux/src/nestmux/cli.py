@@ -79,14 +79,9 @@ def write_configfiles(config):
 
 
 def write_configfile(config, level):
-    # Read the base config
-    # try:
-    #     base_config = open(config["base_tmux_config"]).read()
-    # except KeyError as e:
-    #     print("No base_tmux_config in your config.yml")
-    #     base_config = None
-
     base_config = ""
+
+    # Get the system base config
     if not ("skip_system_config" in config and config["skip_system_config"] == True):
         try:
             global_tmux_config = open("/etc/tmux.conf").read()
@@ -96,6 +91,7 @@ def write_configfile(config, level):
         except BaseException as e:
             pass
 
+    # Get the user config
     if not ("skip_user_config" in config and config["skip_user_config"] == True):
         try:
             user_tmux_config = open(os.path.expanduser("~/.tmux.conf")).read()
@@ -104,6 +100,18 @@ def write_configfile(config, level):
 
         except BaseException as e:
             pass
+
+    # Get any existing level specific config
+    if not ("skip_level_config" in config and config["skip_level_config"] == True):
+        try:
+            level_tmux_config = open(
+                os.path.expanduser(f"~/.nestmux/extraconfig_level{level}")
+            ).read()
+            base_config += level_tmux_config
+            base_config += "\n"
+
+        except BaseException as e:
+            print(e)
 
     # Read the standard
     template = Template(("unbind C-b\n" "set -g prefix C-$escape_key\n"))
