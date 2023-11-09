@@ -1,7 +1,16 @@
 nestmux
 =======
 
-Nested tmux
+## TODO: 
+
+Rewrite without writing config files. Escape key can be specified on the commandline like so. 
+
+    tmux new-session -n MySession \; set-option -g prefix C-a \; bind-key C-a send-prefix
+	
+Here we also need to check the current NESTMUX_LEVEL and increment by 1, picking up the write escape key for the next level.
+
+
+## Nested tmux
 
 A configfile defines how many layers of nesting we want to have, and
 what escape sequence each level should have.
