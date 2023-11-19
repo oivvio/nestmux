@@ -19,18 +19,9 @@ def new_session(prefix:str, server: Server) -> Session:
 
     return session
 
-# def get_or_new_session(session_name: str, prefix: str, server: Server) -> Session:
-#     #breakpoint()
-#     if server.has_session(session_name):
-#         return cast(Session, server.sessions.get(name=session_name))
-#     else:
-#         session = new_session(session_name, prefix, server)
-#         return cast(Session, session)
-
 def attach_session(session: Session):
     # this should be  os.execvp
     # breakpoint()
-    
     os.system(f"tmux -L {SOCKET_NAME} attach-session -t '{session.name}'")
 
 def get_nestinglevel(server: Server, prefixes: List[str]=PREFIXES) -> int:
