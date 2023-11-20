@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nestmux"
-version = "0.1.1"
+version = "0.1.2"
 description = ""
 authors = ["Oivvio Polite <oivvio@liberationtech.net>"]
 readme = "README.md"
