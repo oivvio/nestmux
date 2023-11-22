@@ -1,4 +1,4 @@
-# Nestmux - nested tmux
+# Nestmux - Run nested tmux sessions with ease
 
 Running nested sessions of `tmux` is a bit of a hassle. `nestmux` is here to make it easier.
 
@@ -25,7 +25,7 @@ Invoking `nestmux` again inside the second session will create a second nested s
 }
 ```
 
-`prefixes` is an arbitrarily long ordered list of prefix keys, where the first element will be the prefix key for the first nesting level and so and. The length of this list controls the maximum nesting depth.
+`prefixes` is an arbitrarily long ordered list of prefix keys, where the first element will be the prefix key for the first nesting level and so on. The length of this list controls the maximum nesting depth.
 
 `socket_name` is the name of the `tmux` socket. There's rarely a point in setting this to anything other than the default.
 
@@ -35,11 +35,13 @@ Invoking `nestmux` again inside the second session will create a second nested s
 
 - Add a video to the README.
 
+- Change to TOML for config
+
 - Nicer error messages.
 
-- Command to show config.
+- Command to validate config.
 
-- Command to list current sessions.
+- Command to show config.
 
 - Command to attach to specific session.
 
