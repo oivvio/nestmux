@@ -46,5 +46,3 @@ Invoking `nestmux` again inside the second session will create a second nested s
 - Command to attach to specific session.
 
 - Add FOSS license
-
-- Move to github
