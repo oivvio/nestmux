@@ -8,11 +8,15 @@ from typing import cast, List, TypedDict
 from libtmux.server import Server
 from libtmux.session import Session
 
+import subprocess
 
 class Config(TypedDict):
     prefixes: List[str]
     socket_name: str
 
+
+def get_server(config: Config) -> Server:
+    return Server(socket_name=config["socket_name"])
 
 def read_config() -> Config:
     """
@@ -46,11 +50,13 @@ def new_session(prefix:str, server: Server) -> Session:
     return session
 
 
-def attach_session(session: Session, config: Config):
+def attach_session(session: Session, config: Config, detach=True):
     # this should be  os.execvp
-    # breakpoint()
+
     socket_name = config["socket_name"]
-    os.system(f"tmux -L {socket_name} attach-session -t '{session.name}'")
+    detach_str = " -d " if detach else ""
+    cmd = f"tmux -L {socket_name} attach-session -t '{session.name}' {detach_str} "
+    os.system(cmd)
 
 
 def get_next_nestinglevel(server: Server, config: Config) -> int:

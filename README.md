@@ -42,7 +42,3 @@ Invoking `nestmux` again inside the second session will create a second nested s
 - Command to validate config.
 
 - Command to show config.
-
-- Command to attach to specific session.
-
-- Add FOSS license

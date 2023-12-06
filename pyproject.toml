@@ -1,9 +1,13 @@
 [tool.poetry]
 name = "nestmux"
-version = "0.1.3"
+version = "0.1.4"
 description = "Run nested tmux sessions with ease"
 authors = ["Oivvio Polite <nestmux@liberationtech.net>"]
 readme = "README.md"
+homepage = "https://github.com/oivvio/nestmux"
+repository = "https://github.com/oivvio/nestmux"
+keywords = ["tmux", "cli"]
+
 
 [tool.poetry.dependencies]
 python = "^3.9"

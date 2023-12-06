@@ -6,6 +6,7 @@ from .lib import read_config
 from .lib import get_next_nestinglevel
 from .lib import new_session
 from .lib import attach_session
+from .lib import get_server
 
 
 class NoCompletionTyper(typer.Typer):
@@ -38,7 +39,7 @@ def default(ctx: typer.Context):
 def start_and_attach_new_session():
     """ Create new session and attach to it. """
     config = read_config()
-    server = libtmux.server.Server(socket_name=config["socket_name"])
+    server = get_server(config)
     nesting_level = get_next_nestinglevel(server, config)
 
     try:
@@ -69,8 +70,28 @@ def start_and_attach_new_session():
 def list_sessions():
     """List sessions."""
     config = read_config()
-    cmd = f"tmux -L {config['socket_name']} list-sessions"
-    os.system(cmd)
+    server = get_server(config)
+    sessions = server.sessions
+
+    for session in sessions:
+        prefix = session.show_option("prefix")
+
+        print(f"session {session.name} : prefix {prefix}")
+        for window in session.windows:
+            print(f" - {window.name}")
+        print()
+
+@app.command(name="attach-session")
+def attach_nestmux_session(session_name):
+    """Attach session."""
+    config = read_config()
+    server = get_server(config)
+
+    try:
+        session = [c for c in server.sessions if c.name == session_name][0]
+        attach_session(session,config)
+    except IndexError:
+        print(f"No session named {session_name}")
 
 def main():
     app()
