@@ -42,3 +42,13 @@ Invoking `nestmux` again inside the second session will create a second nested s
 - Command to validate config.
 
 - Command to show config.
+
+- Modify attach-session to have an option to only allow attaching of session that have the "right" nesting level. And make this the default.
+
+- In list-sessions display the nestinglevel and wheater it's can be attached from the current context.
+
+- new-session  should take an optional name argument. This should be checked for uniqueness. If it's not unique, append a count. 
+
+- In list-sessions display whether the session is attached or not.
+
+- attach-session is not able to attach from within another session
